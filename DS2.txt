@@ -1,0 +1,413 @@
+//Answer of 1 
+
+# Define a Node class to create nodes for the linked list
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.next_node = None
+
+# Define the function to sort the linked list in ascending order
+def sort_linked_list(linked_list_str):
+    # Create the linked list from the string representation
+    node_values = linked_list_str.split("->")[1:]
+    head_node = Node(node_values[0])
+    current_node = head_node
+    for value in node_values[1:]:
+        current_node.next_node = Node(value)
+        current_node = current_node.next_node
+
+    # Sort the linked list in ascending order
+    alphabetical_order = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
+    alphabetical_order += [chr(i) for i in range(ord('a'), ord('z') + 1)]
+
+    sorted_head_node = None
+    sorted_tail_node = None
+    for char in alphabetical_order:
+        previous_node = None
+        current_node = head_node
+        while current_node is not None:
+            if current_node.value == char:
+                # Move the current node to the sorted list
+                if sorted_head_node is None:
+                    sorted_head_node = current_node
+                    sorted_tail_node = current_node
+                else:
+                    sorted_tail_node.next_node = current_node
+                    sorted_tail_node = current_node
+                # Remove the current node from the original list
+                if previous_node is not None:
+                    previous_node.next_node = current_node.next_node
+                    current_node = previous_node.next_node
+                else:
+                    head_node = current_node.next_node
+                    current_node = head_node
+            else:
+                previous_node = current_node
+                current_node = current_node.next_node
+        if sorted_tail_node is not None:
+            sorted_tail_node.next_node = None
+
+    # Create the sorted string representation of the linked list
+    result_str = "Head"
+    current_node = sorted_head_node
+    while current_node is not None:
+        result_str += "->" + current_node.value
+        current_node = current_node.next_node
+    result_str += "->NULL"
+
+    return result_str
+
+
+# Test the function
+test_linked_list_str = "Head->D->A->C->A->G->NULL"
+result_str = sort_linked_list(test_linked_list_str)
+expected_output_str = "Head->A->A->C->D->G->NULL"
+assert result_str == expected_output_str, f"Error: Expected {expected_output_str}, but got {result_str}"
+print("Test passed!")
+
+
+
+
+
+
+
+
+
+
+
+//Answer of 2 
+
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.next = None
+
+# Extracts the number represented by a linked list
+def extract_number(linked_list):
+    number_str = ""
+    current_node = linked_list.next
+    while current_node is not None:
+        number_str += str(current_node.value)
+        current_node = current_node.next
+    return int(number_str)
+
+# Creates a linked list to represent a given number
+def create_linked_list(number):
+    number_str = str(number)
+    head = Node(None)
+    current_node = head
+    for digit in number_str:
+        current_node.next = Node(int(digit))
+        current_node = current_node.next
+    return head
+
+# Adds two numbers represented by linked lists
+def linked_list_addition(linked_list_1, linked_list_2):
+    # Create linked lists from the input strings
+    linked_list_1 = linked_list_1.split("->")[1:-1]
+    linked_list_2 = linked_list_2.split("->")[1:-1]
+    head_1 = Node(None)
+    current_node = head_1
+    for value in linked_list_1:
+        current_node.next = Node(int(value))
+        current_node = current_node.next
+    head_2 = Node(None)
+    current_node = head_2
+    for value in linked_list_2:
+        current_node.next = Node(int(value))
+        current_node = current_node.next
+
+    # Extract the two numbers from the linked lists
+    number_1 = extract_number(head_1)
+    number_2 = extract_number(head_2)
+    sum_number = number_1 + number_2
+
+    # Create a linked list to represent the sum of the two numbers
+    sum_linked_list = create_linked_list(sum_number)
+
+    # Create a string representation of the sum linked list
+    result = "Head"
+    current_node = sum_linked_list.next
+    while current_node is not None:
+        result += "->" + str(current_node.value)
+        current_node = current_node.next
+    result += "->NULL"
+
+    return result
+
+# Test the function
+linked_list_1 = "Head->1->2->3->4->NULL"
+linked_list_2 = "Head->5->6->7->8->NULL"
+result = linked_list_addition(linked_list_1, linked_list_2)
+expected_output = "Head->6->9->1->2->NULL"
+assert result == expected_output, f"Error: Expected {expected_output}, but got {result}"
+print("Test passed!")
+
+
+
+
+
+
+//Answer of 3 
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class CircularLinkedList:
+    def __init__(self):
+        # Initialize the circular linked list with a head node and a length of 0
+        self.head = None
+        self.length = 0
+
+    def append(self, data):
+        # Append a new node to the end of the circular linked list
+        new_node = Node(data)
+        if not self.head:
+            # If the linked list is empty, set the new node as the head and point it to itself
+            self.head = new_node
+            new_node.next = self.head
+        else:
+            # Otherwise, find the last node in the linked list and set its next node to the new node
+            curr_node = self.head
+            while curr_node.next != self.head:
+                curr_node = curr_node.next
+            curr_node.next = new_node
+            new_node.next = self.head
+        self.length += 1
+
+    def delete_node(self, node):
+        # Delete a node from the linked list
+        if self.head == node:
+            # If the node to be deleted is the head, update the last node's next pointer and set the next node as the new head
+            curr_node = self.head
+            while curr_node.next != self.head:
+                curr_node = curr_node.next
+            curr_node.next = self.head.next
+            self.head = self.head.next
+        else:
+            # Otherwise, find the previous node and update its next pointer to bypass the current node
+            prev_node = self.head
+            curr_node = self.head.next
+            while curr_node != self.head:
+                if curr_node == node:
+                    prev_node.next = curr_node.next
+                    break
+                prev_node = curr_node
+                curr_node = curr_node.next
+        self.length -= 1
+
+def find_king(num_of_monkeys, gap):
+    # Create the circular linked list of monkeys labeled 0 to (num_of_monkeys-1)
+    monkeys = CircularLinkedList()
+    for i in range(num_of_monkeys):
+        monkeys.append(i)
+
+    # Start eliminating monkeys until there is only one monkey left
+    curr_node = monkeys.head
+    while monkeys.length > 1:
+        # Move to the monkey to be eliminated based on the gap size
+        for i in range(gap-1):
+            curr_node = curr_node.next
+
+        # Eliminate the monkey and update the current node
+        next_node = curr_node.next
+        monkeys.delete_node(curr_node)
+        curr_node = next_node
+
+    # Return the label of the remaining monkey (0-based index)
+    return monkeys.head.data
+
+# Testing
+num_of_monkeys = 8
+gap = 5
+king = find_king(num_of_monkeys, gap)
+print("The king will be monkey number:", king)
+
+
+
+
+
+
+//Answer of 4
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+    
+    def append(self, data):
+        new_node = Node(data)
+        if self.head is None:
+            self.head = new_node
+            return
+        last_node = self.head
+        while last_node.next:
+            last_node = last_node.next
+        last_node.next = new_node
+    
+    def to_list(self):
+        result = []
+        curr = self.head
+        while curr:
+            result.append(curr.data)
+            curr = curr.next
+        return result
+
+def commElem(l, m):
+    l_list = l.to_list()
+    m_list = m.to_list()
+    common_list = []
+    for elem in l_list:
+        if elem in m_list and elem not in common_list:
+            common_list.append(elem)
+    common_ll = LinkedList()
+    for elem in common_list:
+        common_ll.append(elem)
+    return common_ll
+
+l = LinkedList()
+l.append('G')
+l.append('O')
+l.append('O')
+l.append('D')
+
+m = LinkedList()
+m.append('G')
+m.append('o')
+m.append('O')
+m.append('g')
+m.append('L')
+m.append('E')
+
+common_list = commElem(l, m)
+print(common_list.to_list())
+
+
+
+
+
+//Answer of 5
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+    
+    def append(self, data):
+        new_node = Node(data)
+        if self.head is None:
+            self.head = new_node
+            return
+        last_node = self.head
+        while last_node.next:
+            last_node = last_node.next
+        last_node.next = new_node
+    
+    def to_list(self):
+        result = []
+        curr = self.head
+        while curr:
+            result.append(curr.data)
+            curr = curr.next
+        return result
+
+def diffElem_LL(l, m):
+    l_list = l.to_list()
+    m_list = m.to_list()
+    diff_list = []
+    for elem in l_list:
+        if elem not in m_list and elem not in diff_list:
+            diff_list.append(elem)
+    for elem in m_list:
+        if elem not in l_list and elem not in diff_list:
+            diff_list.append(elem)
+    diff_ll = LinkedList()
+    for elem in diff_list:
+        diff_ll.append(elem)
+    return diff_ll
+
+l = LinkedList()
+l.append('G')
+l.append('O')
+l.append('O')
+l.append('D')
+
+m = LinkedList()
+m.append('G')
+m.append('o')
+m.append('O')
+m.append('g')
+m.append('L')
+m.append('E')
+
+diff_list = diffElem_LL(l, m)
+print(diff_list.to_list())
+
+
+
+
+
+//Answer of 6
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+def is_loopLL(head):
+    slow_p = head
+    fast_p = head
+    while(slow_p and fast_p and fast_p.next):
+        slow_p = slow_p.next
+        fast_p = fast_p.next.next
+        if slow_p == fast_p:
+            return True
+    return False
+
+def test_is_loopLL():
+    a = Node(1)
+    b = Node(2)
+    c = Node(3)
+    d = Node(4)
+    e = Node(5)
+    a.next = b
+    b.next = c
+    c.next = d
+    d.next = e
+    e.next = c
+    assert is_loopLL(a) == True
+
+test_is_loopLL()
+
+
+
+
+
+
+//Answer of 7
+def conv_LL(l, m):
+    """
+    Multiplies two polynomials represented as arrays l and m of their coefficients.
+    Returns the coefficients of the resulting polynomial as an array.
+    """
+    n = len(l) + len(m) - 1
+    result = [0] * n
+    for i in range(len(l)):
+        for j in range(len(m)):
+            result[i+j] += l[i] * m[j]
+    return result
+
+# Example usage
+l = [1, 0, 2, 3, 0, 4]
+m = [5, 6, 0, 7, 8, 0]
+print(conv_LL(l, m))  
+
+
+
+
